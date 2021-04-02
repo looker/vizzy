@@ -8,6 +8,7 @@ These submodules manage various behavior that is considered Marketplace inclusio
 - Proper labeling
 - Proper value formatting (and overrides)
 - Proper series color
+- Tooltip
 
 
 ## Vizzy sub-module requirements
