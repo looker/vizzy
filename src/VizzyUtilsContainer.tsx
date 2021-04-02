@@ -5,7 +5,7 @@ import {JsonViewer} from "./VizzyUtils"
 import {
   Chunk,
   Looker,
-  SteppedFunnelChart, 
+  CustomViz, 
 } from './types'
 import {
   Vizzy,
@@ -19,11 +19,22 @@ import {
 declare var looker: Looker
 declare var LookerCharts: LookerChartUtils
 
-const vis: SteppedFunnelChart = {
+const vis: CustomViz = {
   // initial options applied to viz
   options: {
-    // AXES
-    label_left_axis: Vizzy.makeToggle("Axes", "Label Left Axis", false, 1),
+    view: Vizzy.makeList("Plot", "Json Inspector", "vizData", 
+    [
+      {"data": "data"},
+      {"element": "element"},
+      {"config": "config"},
+      {"queryResponse": "queryResponse"},
+      {"details": "details"},
+      {"done": "done"},
+      {"prepared data": "vizData"},
+    ],
+    0),
+    numDims: Vizzy.makeNumber("Plot", "Number of Dimensions", 1, 1),
+    numMeas: Vizzy.makeNumber("Plot", "Number of Measures", 1, 2),
   },
   // this happens exactly once
   create(element, config) {
@@ -36,18 +47,27 @@ const vis: SteppedFunnelChart = {
     Object.assign(previousOptions, this.options)
 
     // add any dynamic options
-    this.options.left_axis_label = config.label_left_axis && Vizzy.dependString("Axes", "Left Axis Label", "", "label_left_axis", vis)
+    this.options.strictDims = Vizzy.dependToggle("Plot", `Expect exactly ${config.numDims} dimensions`, false, "numDims", vis)
+    this.options.strictMeas = Vizzy.dependToggle("Plot", `Expect exactly ${config.numMeas} measures`, false, "numMeas", vis)
 
     // register new options if options has changed since last render
     if (JSON.stringify(previousOptions) !== JSON.stringify(this.options)) {
       this.trigger && this.trigger('registerOptions', this.options)
     }
 
+    // use Vizzy to create a slim, data-ful queryResponse
+    const vizData = Vizzy.prepare(data, config, queryResponse, vis, {
+      numDims: config.numDims,
+      strictDims: config.strictDims,
+      numMeas: config.numMeas,
+      strictMeas: config.strictMeas,
+    })
+
     // render chart
     this.chart = ReactDOM.render(
       <ComponentsProvider>
         <JsonViewer 
-          data={data}
+          data={eval(config.view)}
         />
       </ComponentsProvider>,
       element
