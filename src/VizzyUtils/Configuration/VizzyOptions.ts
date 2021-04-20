@@ -155,7 +155,7 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       values: choices
     }
   },
-  makeDivider(section: string, label: string, init: string, order: number,): VisOption {
+  makeDivider(section: string, label: string, init: string, order: number): VisOption {
     return {
       type: "string",
       label: label,
@@ -165,7 +165,7 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       order: order * 10,
     }
   },
-  makeNumberRange(section: string, label: string, init: string, choices: SelectOption[], order: number,): VisOption {
+  makeNumberRange(section: string, label: string, init: string, choices: SelectOption[], order: number): VisOption {
     return {
       type: "number",
       label: label,
