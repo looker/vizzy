@@ -50,8 +50,13 @@ export {
 } from './QueryIngestion/types'
 
 import { VizzyOptionsManager } from './Configuration/VizzyOptions'
+import { VizzyQueryFormatter } from './QueryIngestion'
 
+/**
+ * The Vizzy module provides classes and utilities for advanced Custom Visualization development such as for Marketplace visualizations.
+ */
 const Vizzy = {
   ...VizzyOptionsManager,
+  ...VizzyQueryFormatter,
 }
 export { Vizzy }

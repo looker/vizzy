@@ -36,6 +36,6 @@ export interface Chunk {
   sort_index?: number
 }
 
-export interface SteppedFunnelChart extends VisualizationDefinition {
+export interface CustomViz extends VisualizationDefinition {
   chart?: any
 }

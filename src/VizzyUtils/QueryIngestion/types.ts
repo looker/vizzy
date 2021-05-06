@@ -71,3 +71,16 @@ export interface Row {
 }
 
 export type VisData = Row[]
+
+export interface FormattedQuery {
+  dimensions?: Cell[][]
+  measures?: Cell[][]
+}
+
+export interface QueryFormatterRules {
+  numDims?: number
+  strictDims?: boolean
+  numMeas?: number
+  strictMeas?: boolean
+}
+

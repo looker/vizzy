@@ -37,6 +37,11 @@ export interface MarketplaceOptionsManager {
   makeNumber: (section: string, label: string, init: number, order: number) => VisOption
   makeList: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
   makeSmallList: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
+  makeRadio: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
+  dependRadio: (section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any) => VisOption,
+  makeDivider: (section: string, label: string, init: string, order: number) => VisOption,
+  makeNumberRange: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
+  dependNumberRange: (section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any) => VisOption,
 }
 
 export const VizzyOptionsManager: MarketplaceOptionsManager = {
@@ -126,6 +131,60 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       order: order * 10,
       values: choices,
       display_size: "third"
+    }
+  },
+  makeRadio(section: string, label: string, init: string, choices: SelectOption[], order: number,): VisOption {
+    return {
+      type: "string",
+      label: label,
+      default: init,
+      display: "radio",
+      section: section,
+      order: order * 10,
+      values: choices
+    }
+  },
+  dependRadio(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any): VisOption {
+    return {
+      type: "string",
+      label: label,
+      default: init,
+      display: "radio",
+      section: section,
+      order: parentObj.options[parentKey].order + 1,
+      values: choices
+    }
+  },
+  makeDivider(section: string, label: string, init: string, order: number): VisOption {
+    return {
+      type: "string",
+      label: label,
+      default: init,
+      display: "divider",
+      section: section,
+      order: order * 10,
+    }
+  },
+  makeNumberRange(section: string, label: string, init: string, choices: SelectOption[], order: number): VisOption {
+    return {
+      type: "number",
+      label: label,
+      default: init,
+      display: "range",
+      section: section,
+      order: order * 10,
+      values: choices
+    }
+  },
+  dependNumberRange(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any): VisOption {
+    return {
+      type: "number",
+      label: label,
+      default: init,
+      display: "range",
+      section: section,
+      order: parentObj.options[parentKey].order + 1,
+      values: choices
     }
   }
 }
