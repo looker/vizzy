@@ -25,35 +25,46 @@
 
  */
 
-import {VisOption, SelectOption} from './types'
+import {VisOption, SelectOption, SectionOrder} from './types'
 
-export interface MarketplaceOptionsManager {
-  makeToggle: (section: string, label: string, init: boolean, order: number) => VisOption,
-  makeString: (section: string, label: string, init: string, order: number) => VisOption,
-  makeColor: (section: string, label: string, order: number) => VisOption,
-  dependToggle: (section: string, label: string, init: boolean, parentKey: string, parentObj: any) => VisOption,
-  dependSingleColor: (section: string, label: string, parentKey: string, parentObj: any) => VisOption,
-  dependString: (section: string, label: string, init: string, parentKey: string, parentObj: any) => VisOption,
-  makeNumber: (section: string, label: string, init: number, order: number) => VisOption
-  makeList: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
-  makeSmallList: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
-  makeRadio: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
-  dependRadio: (section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any) => VisOption,
-  makeDivider: (section: string, label: string, init: string, order: number) => VisOption,
-  makeNumberRange: (section: string, label: string, init: string, choices: SelectOption[], order: number) => VisOption,
-  dependNumberRange: (section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any) => VisOption,
-}
+/**
+ * The buffer between managed section options / the max number of option dependencies
+ */
+const OPTION_DEPEND_LIMIT = 10
 
-export const VizzyOptionsManager: MarketplaceOptionsManager = {
-  makeToggle(section: string, label: string, init: boolean, order: number): VisOption {
+export class VizzyOptionsManager {
+  
+  /**
+   * A lookup structure for keeping track of available order indexes for each section.
+   */
+  order: SectionOrder
+
+  constructor() {
+    this.order = {}
+  }
+
+  /**
+   * Gets the next available option index for a given section. This allows configuration options
+   * to be ordered in the order they are called.
+   * @param section the string name of the viz config section
+   * @returns the request section index
+   */
+  getNextSectionOrder(section: string) {
+    const sectionKey = encodeURI(section)
+    const currentIndex = this.order[sectionKey] || 0
+    this.order[sectionKey] = currentIndex + 1
+    return currentIndex
+  }
+
+  makeToggle(section: string, label: string, init: boolean): VisOption {
     return {
       type: "boolean",
       label: label,
       default: init,
       section: section,
-      order: order * 10
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
     }
-  },
+  }
   dependToggle(section: string, label: string, init: boolean, parentKey: string, parentObj: any): VisOption {
     return {
       type: "boolean",
@@ -62,25 +73,25 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       section: section,
       order: parentObj.options[parentKey].order + 1
     }
-  },
-  makeString(section: string, label: string, init: string, order: number): VisOption {
+  }
+  makeString(section: string, label: string, init: string): VisOption {
     return {
       type: "string",
       label: label,
       default: init,
       section: section,
-      order: order * 10
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
     }
-  },
-  makeNumber(section: string, label: string, init: number, order: number): VisOption {
+  }
+  makeNumber(section: string, label: string, init: number): VisOption {
     return {
       type: "number",
       label: label,
       default: init,
       section: section,
-      order: order * 10
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
     }
-  },
+  }
   dependString(section: string, label: string, init: string, parentKey: string, parentObj: any): VisOption {
     return {
       type: "string",
@@ -89,16 +100,16 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       section: section,
       order: parentObj.options[parentKey].order + 1
     }
-  },
-  makeColor(section: string, label: string, order: number): VisOption {
+  }
+  makeColor(section: string, label: string): VisOption {
     return {
       type: "array",
       label: label,
       section: section,
       display: "colors",
-      order: order * 10
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
     }
-  },
+  }
   dependSingleColor(section: string, label: string, parentKey: string, parentObj: any): VisOption {
     return {
       type: "array",
@@ -109,41 +120,41 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       display_size: "half",
       default: ["#282828"],
     }
-  },
-  makeList(section: string, label: string, init: string, choices: SelectOption[], order: number,): VisOption {
+  }
+  makeList(section: string, label: string, init: string, choices: SelectOption[]): VisOption {
     return {
       type: "string",
       label: label,
       default: init,
       display: "select",
       section: section,
-      order: order * 10,
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
       values: choices
     }
-  },
-  makeSmallList(section: string, label: string, init: string, choices: SelectOption[], order: number,): VisOption {
+  }
+  makeSmallList(section: string, label: string, init: string, choices: SelectOption[]): VisOption {
     return {
       type: "string",
       label: label,
       default: init,
       display: "select",
       section: section,
-      order: order * 10,
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
       values: choices,
       display_size: "third"
     }
-  },
-  makeRadio(section: string, label: string, init: string, choices: SelectOption[], order: number,): VisOption {
+  }
+  makeRadio(section: string, label: string, init: string, choices: SelectOption[]): VisOption {
     return {
       type: "string",
       label: label,
       default: init,
       display: "radio",
       section: section,
-      order: order * 10,
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
       values: choices
     }
-  },
+  }
   dependRadio(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any): VisOption {
     return {
       type: "string",
@@ -154,28 +165,28 @@ export const VizzyOptionsManager: MarketplaceOptionsManager = {
       order: parentObj.options[parentKey].order + 1,
       values: choices
     }
-  },
-  makeDivider(section: string, label: string, init: string, order: number): VisOption {
+  }
+  makeDivider(section: string, label: string, init: string): VisOption {
     return {
       type: "string",
       label: label,
       default: init,
       display: "divider",
       section: section,
-      order: order * 10,
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
     }
-  },
-  makeNumberRange(section: string, label: string, init: string, choices: SelectOption[], order: number): VisOption {
+  }
+  makeNumberRange(section: string, label: string, init: string, choices: SelectOption[]): VisOption {
     return {
       type: "number",
       label: label,
       default: init,
       display: "range",
       section: section,
-      order: order * 10,
+      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
       values: choices
     }
-  },
+  }
   dependNumberRange(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any): VisOption {
     return {
       type: "number",

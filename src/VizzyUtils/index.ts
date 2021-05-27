@@ -25,10 +25,10 @@
 
  */
 
-export { HelloWorld } from './HelloWorld'
 export { JsonViewer } from './components'
 export { LookerChartUtils, VisualizationDefinition } from './types'
 export { TooltipProps, VizzyTooltipProps, VizzyTooltip } from './Tooltip/VizzyTooltip'
+
 export { 
   VisOption,
   SelectOption,
@@ -49,14 +49,10 @@ export {
   VisData
 } from './QueryIngestion/types'
 
-import { VizzyOptionsManager } from './Configuration/VizzyOptions'
+import { VizzyOptionsManager } from './Configuration'
 import { VizzyQueryFormatter } from './QueryIngestion'
 
 /**
  * The Vizzy module provides classes and utilities for advanced Custom Visualization development such as for Marketplace visualizations.
  */
-const Vizzy = {
-  ...VizzyOptionsManager,
-  ...VizzyQueryFormatter,
-}
-export { Vizzy }
+export class VizzyUtils extends VizzyQueryFormatter {}

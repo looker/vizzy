@@ -59,3 +59,7 @@ export type VisConfigValue = any
 interface VisOptionSelection {
   [key: string]: string
 }
+
+export interface SectionOrder {
+  [key: string]: number
+}
