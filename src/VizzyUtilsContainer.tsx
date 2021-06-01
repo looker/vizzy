@@ -1,25 +1,25 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import {ComponentsProvider} from "@looker/components"
-import {JsonViewer} from "./VizzyUtils"
+import * as React from "react"
+import * as ReactDOM from "react-dom"
+import {ComponentsProvider, ProgressCircular, Space, Heading} from "@looker/components"
+import {JsonViewer, ChartArea, VizzyUtils} from "./VizzyUtils"
 import {
-  Chunk,
   Looker,
   CustomViz, 
 } from './types'
 import {
-  Vizzy,
   VisOptions,
-  Link,
-  Row,
   LookerChartUtils
 } from './VizzyUtils'
 
 // Global values provided via the API
 declare var looker: Looker
+// TODO: Prototype LookerChartUtils examples
 declare var LookerCharts: LookerChartUtils
 
-const vis: CustomViz = {
+// Instantiate the VizzyUtils helper class
+const Vizzy = new VizzyUtils()
+
+const viz: CustomViz = {
   // initial options applied to viz
   options: {
     view: Vizzy.makeList("Plot", "Json Inspector", "vizData", 
@@ -31,32 +31,35 @@ const vis: CustomViz = {
       {"details": "details"},
       {"done": "done"},
       {"prepared data": "vizData"},
-    ],
-    0),
-    numDims: Vizzy.makeNumber("Plot", "Number of Dimensions", 1, 1),
-    numMeas: Vizzy.makeNumber("Plot", "Number of Measures", 1, 2),
+    ]),
+    showTitle: Vizzy.makeToggle("Plot", "Show Title Override", false),
+    numDims: Vizzy.makeNumber("Plot", "Number of Dimensions", 1),
+    numMeas: Vizzy.makeNumber("Plot", "Number of Measures", 1),
   },
   // this happens exactly once
   create(element, config) {
-    // DO NOTHING
+    // Do Nothing
   },
   // this happens for every render n > 0
   updateAsync(data, element, config, queryResponse, details, doneRendering) {
     // save a copy of previous render's options
+    // TODO move to Vizzy.loadOptions
     let previousOptions: VisOptions = {}
     Object.assign(previousOptions, this.options)
 
     // add any dynamic options
-    this.options.strictDims = Vizzy.dependToggle("Plot", `Expect exactly ${config.numDims} dimensions`, false, "numDims", vis)
-    this.options.strictMeas = Vizzy.dependToggle("Plot", `Expect exactly ${config.numMeas} measures`, false, "numMeas", vis)
+    this.options.titleText = config.showTitle && Vizzy.dependString("Plot", "Title Override", "Hello, world!", "showTitle", viz)
+    this.options.strictDims = Vizzy.dependToggle("Plot", `Expect exactly ${config.numDims} dimensions`, false, "numDims", viz)
+    this.options.strictMeas = Vizzy.dependToggle("Plot", `Expect exactly ${config.numMeas} measures`, false, "numMeas", viz)
 
-    // register new options if options has changed since last render
+    // register new options if options have changed since last render
+    // TODO move to Vizzy.saveOptions
     if (JSON.stringify(previousOptions) !== JSON.stringify(this.options)) {
       this.trigger && this.trigger('registerOptions', this.options)
     }
 
     // use Vizzy to create a slim, data-ful queryResponse
-    const vizData = Vizzy.prepare(data, config, queryResponse, vis, {
+    const vizData = Vizzy.prepare(data, config, queryResponse, viz, {
       numDims: config.numDims,
       strictDims: config.strictDims,
       numMeas: config.numMeas,
@@ -65,11 +68,12 @@ const vis: CustomViz = {
 
     // render chart
     this.chart = ReactDOM.render(
-      <ComponentsProvider>
+      <ChartArea>
+        {config.showTitle && <Heading>{config.titleText}</Heading>}
         <JsonViewer 
           data={eval(config.view)}
         />
-      </ComponentsProvider>,
+      </ChartArea>,
       element
     )
 
@@ -78,5 +82,4 @@ const vis: CustomViz = {
   }
 }
 
-
-looker.plugins.visualizations.add(vis)
+looker.plugins.visualizations.add(viz)

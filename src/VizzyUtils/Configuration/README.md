@@ -1,6 +1,101 @@
 # Configuration Manager
 This submodule defines various helpers for configuration/option management. 
 
+## API Reference
+Vizzy contains option-generation helpers of `make` and `depend` variants. 
+
+### makeOption
+The `make` variant should be used for unconditionally present configuration options. These options will always be visible, always apply a default value to the visualization `config`, and be able to accept dependent options.
+
+Available makeOptions: [makeToggle, makeString, makeNumber, makeColor, makeList, makeSmallList, makeRadio, makeDivider, makeNumberRange]
+
+```
+interface props<makeOption> {
+  /**
+  `section` - The Visualization Configuration pane's Tab text
+  */
+  section: string
+  /**
+  `label` - The label accompanying the option input
+  */
+  label: string
+  /**
+  `init` - The default value
+  */
+  init?: any
+  /**
+  `choices` - The list of choices for Select option inputs
+  */
+  choices?: SelectOption[]
+}
+```
+
+### Example usage
+```
+const viz: CustomViz = {
+  options: {
+    showFeature: Vizzy.makeToggle("Styles", "Show Feature", false)
+  },
+  ...
+}
+```
+**Note! Option keys should contain at least two parts and be written/referenced in camelCase.**
+
+### dependOption
+The `depend` variant should be used for dynamic or conditional configuration options.
+ 
+Available dependOptions: [dependToggle, dependString, dependSingleColor, dependRadio, dependNumberRange]
+
+```
+interface props<dependOption> {
+  /**
+  `section` - The Visualization Configuration pane's Tab text
+  */
+  section: string
+  /**
+  `label` - The label accompanying the option input
+  */
+  label: string
+  /**
+  `init` - The default value
+  */
+  init?: any
+  /**
+  `choices` - The list of choices for Select option inputs
+  */
+  choices?: SelectOption[]
+  /**
+  `parentKey` - The option key of the parent. Option keys should contain at least two parts and be written/referenced in camelCase.
+  */
+  parentKey: string
+  /**
+  `parentObj` - The current Visualization object, whose options are indexed into
+  */
+  parentObj: CustomViz
+}
+```
+
+### Example usage
+```
+const viz: CustomViz = {
+  options: {
+    enableFeature: Vizzy.makeToggle("Styles", "Enable Feature", false)
+  },
+  updateAsync(data, element, config, queryResponse, details, doneRendering) {
+    ...
+    // conditional option
+    this.options.featureValue = config.enableFeature && 
+      Vizzy.dependString("Plot", "Feature Input", "Hello, world!", "enableFeature", viz)
+    // dynamic option
+    this.options.featureStyle = Vizzy.dependToggle("Plot", `Apply "${config.featureValue}" style`, false, "featureValue", viz)
+    ...
+  },
+  ...
+}
+```
+**Note! Option keys should contain at least two parts and be written/referenced in camelCase.**
+
+
 ## Adding New Configuration Options:
 In src/ChartContainer.tsx, find:
 options: {

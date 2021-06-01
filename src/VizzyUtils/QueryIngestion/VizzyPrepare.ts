@@ -24,26 +24,11 @@
  SOFTWARE.
 
  */
-import {VisConfig} from '../Configuration'
-import { LookerChartUtils, VisualizationDefinition } from '../types'
+import {VisConfig, VizzyOptionsManager} from '../Configuration'
+import { VisualizationDefinition } from '../types'
 import {FormattedQuery, VisQueryResponse, VisData, QueryFormatterRules} from './types'
 
-export interface QueryFormatter {
-  /**
-   * Creates a slim, data-ful queryResponse. This function takes in the Looker query objects and returns a structure well suited for visualization development
-   * @param data - data obj from Looker
-   * @param config - config obj from Looker
-   * @param queryResponse - queryResponse obj from Looker
-   * @param vis - the vis obj itself
-   * @param rules - some options for error handling/boundary checking
-   */
-  prepare: (data: VisData, config: VisConfig, queryResponse: VisQueryResponse, vis: VisualizationDefinition, rules: QueryFormatterRules) => FormattedQuery,
-  /**
-   * Retrieves the requested field metadata
-   * @param queryFields - which queryResponse fields to consider
-   * @param columns - first N fields to get
-   */
-  getQueryMetadata: (queryFields: any, columns: number) => any,
+export class VizzyQueryFormatter extends VizzyOptionsManager {
   /**
    * Ensure that the prepared data shape is as expected
    * @param data - single category data, from getQueryMetadata()
@@ -51,7 +36,13 @@ export interface QueryFormatter {
    * @param queryLength - actual length of category data, from Looker queryResponse
    * @param strictLength - whether or not to enforce length check
    */
-  validateInputShape: (data: any, addError: any, queryLength: number, strictLength: boolean) => void,
+   validateInputShape(data: any, addError: any, queryLength: number, strictLength: boolean): void {
+    if (strictLength) {
+      if (data.length !== queryLength) {
+        addError({title: "Invalid input", message: `Expected ${data.length} ${data[0][0].field_category}s, found ${queryLength}.`})
+      }
+    }
+  }
   /**
    * Ensure that the input data is of a shape which can be properly prepared
    * @param data - data obj from Looker
@@ -59,18 +50,7 @@ export interface QueryFormatter {
    * @param rules - some options for error handling/boundary checking
    * @param addError - function for reporting an error back to Looker
    */
-  validatePrepareShape: (data: any, queryResponse: VisQueryResponse, rules: QueryFormatterRules, addError: any) => void,
-}
-
-export const VizzyQueryFormatter: QueryFormatter = {
-  validateInputShape(data, addError, queryLength, strictLength) {
-    if (strictLength) {
-      if (data.length !== queryLength) {
-        addError({title: "Invalid input", message: `Expected ${data.length} ${data[0][0].field_category}s, found ${queryLength}.`})
-      }
-    }
-  },
-  validatePrepareShape(data, queryResponse, rules, addError) {
+   validatePrepareShape(data: any, queryResponse: VisQueryResponse, rules: QueryFormatterRules, addError: any): void {
     const actualDims = queryResponse.fields.dimension_like.length
     const actualMeas = queryResponse.fields.measure_like.length
     if (data.length === 0) {
@@ -79,11 +59,16 @@ export const VizzyQueryFormatter: QueryFormatter = {
     if (rules.strictDims && actualDims !== rules.numDims) {
       addError({title: "Invalid input", message: `Expected ${rules.numDims} dimensions, found ${actualDims}.`})
     }
-    else if (rules.strictDims && actualMeas !== rules.numMeas) {
+    else if (rules.strictMeas && actualMeas !== rules.numMeas) {
       addError({title: "Invalid input", message: `Expected ${rules.numMeas} measures, found ${actualMeas}.`})
     }
-  },
-  getQueryMetadata(queryFields, columns) {
+  }
+  /**
+   * Retrieves the requested field metadata
+   * @param queryFields - which queryResponse fields to consider
+   * @param columns - first N fields to get
+   */
+   getQueryMetadata(queryFields: any, columns: number): any {
     const filtered = queryFields.filter((d: any, i: number) => {
       return i <= columns - 1
     })
@@ -91,8 +76,16 @@ export const VizzyQueryFormatter: QueryFormatter = {
       // this is where queryResponse metadata can be brought over to each Cell
       return {field_name: d.name, field_category: d.category, label: d.label_short}
     })
-  },
-  prepare(data, config, queryResponse, vis, rules) {
+  }
+  /**
+   * Creates a slim, data-ful queryResponse. This function takes in the Looker query objects and returns a structure well suited for visualization development
+   * @param data - data obj from Looker
+   * @param config - config obj from Looker
+   * @param queryResponse - queryResponse obj from Looker
+   * @param vis - the vis obj itself
+   * @param rules - some options for error handling/boundary checking
+   */
+   prepare(data: VisData, config: VisConfig, queryResponse: VisQueryResponse, vis: VisualizationDefinition, rules: QueryFormatterRules): FormattedQuery {
     this.validatePrepareShape(data, queryResponse, rules, vis.addError)
     
     const dims = this.getQueryMetadata(queryResponse.fields.dimension_like, rules.numDims || 0)
@@ -121,5 +114,5 @@ export const VizzyQueryFormatter: QueryFormatter = {
       measures: [...measData],
       ...rules
     }
-  },
+  }
 }
