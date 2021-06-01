@@ -2,9 +2,11 @@
 This submodule defines various helpers for configuration/option management. 
 
 ## API Reference
-Vizzy contains option-generation helpers of `make` and `depend` variants.
+Vizzy contains option-generation helpers of `make` and `depend` variants. 
 
 ### makeOption
+The `make` variant should be used for unconditionally present configuration options. These options will always be visible, always apply a default value to the visualization `config`, and be able to accept dependent options.
+
 Available makeOptions: [makeToggle, makeString, makeNumber, makeColor, makeList, makeSmallList, makeRadio, makeDivider, makeNumberRange]
 
 ```
@@ -37,9 +39,10 @@ const viz: CustomViz = {
   ...
 }
 ```
-Note! Option keys should contain at least two parts and be written/referenced in camelCase.
+**Note! Option keys should contain at least two parts and be written/referenced in camelCase.**
 
 ### dependOption
+The `depend` variant should be used for dynamic or conditional configuration options. 
 Available dependOptions: [dependToggle, dependString, dependSingleColor, dependRadio, dependNumberRange]
 
 ```
@@ -61,7 +64,7 @@ interface props<dependOption> {
   */
   choices?: SelectOption[]
   /**
-  `parentKey` - The option key of the parent
+  `parentKey` - The option key of the parent. Option keys should contain at least two parts and be written/referenced in camelCase.
   */
   parentKey: string
   /**
@@ -75,18 +78,21 @@ interface props<dependOption> {
 ```
 const viz: CustomViz = {
   options: {
-    showFeature: Vizzy.makeToggle("Styles", "Show Feature", false)
+    enableFeature: Vizzy.makeToggle("Styles", "Enable Feature", false)
   },
   updateAsync(data, element, config, queryResponse, details, doneRendering) {
     ...
-    this.options.featureValue = config.showFeature && 
-      Vizzy.dependString("Plot", "Feature Input", "Hello, world!", "showFeature", viz)
+    // conditional option
+    this.options.featureValue = config.enableFeature && 
+      Vizzy.dependString("Plot", "Feature Input", "Hello, world!", "enableFeature", viz)
+    // dynamic option
+    this.options.featureStyle = Vizzy.dependToggle("Plot", `Apply "${config.featureValue}" style`, false, "featureValue", viz)
     ...
   },
   ...
 }
 ```
-Note! Option keys should contain at least two parts and be written/referenced in camelCase.
+**Note! Option keys should contain at least two parts and be written/referenced in camelCase.**
 
 
 ## Adding New Configuration Options:
