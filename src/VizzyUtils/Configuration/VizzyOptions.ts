@@ -25,12 +25,13 @@
 
  */
 
+import { VisualizationDefinition } from '../index'
 import {VisOption, SelectOption, SectionOrder} from './types'
 
 /**
  * The buffer between managed section options / the max number of option dependencies
  */
-const OPTION_DEPEND_LIMIT = 10
+const OPTION_INDEX_BUFFER = 10
 
 export class VizzyOptionsManager {
   
@@ -46,14 +47,14 @@ export class VizzyOptionsManager {
   /**
    * Gets the next available option index for a given section. This allows configuration options
    * to be ordered in the order they are called.
-   * @param section the string name of the viz config section
+   * @param section - the string name of the viz config section
    * @returns the request section index
    */
   getNextSectionOrder(section: string) {
     const sectionKey = encodeURI(section)
     const currentIndex = this.order[sectionKey] || 0
     this.order[sectionKey] = currentIndex + 1
-    return currentIndex
+    return currentIndex * OPTION_INDEX_BUFFER
   }
 
   makeToggle(section: string, label: string, init: boolean): VisOption {
@@ -62,7 +63,7 @@ export class VizzyOptionsManager {
       label: label,
       default: init,
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
+      order: this.getNextSectionOrder(section)
     }
   }
   dependToggle(section: string, label: string, init: boolean, parentKey: string, parentObj: any): VisOption {
@@ -80,7 +81,7 @@ export class VizzyOptionsManager {
       label: label,
       default: init,
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
+      order: this.getNextSectionOrder(section)
     }
   }
   makeNumber(section: string, label: string, init: number): VisOption {
@@ -89,7 +90,7 @@ export class VizzyOptionsManager {
       label: label,
       default: init,
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
+      order: this.getNextSectionOrder(section)
     }
   }
   dependString(section: string, label: string, init: string, parentKey: string, parentObj: any): VisOption {
@@ -107,7 +108,7 @@ export class VizzyOptionsManager {
       label: label,
       section: section,
       display: "colors",
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT
+      order: this.getNextSectionOrder(section)
     }
   }
   dependSingleColor(section: string, label: string, parentKey: string, parentObj: any): VisOption {
@@ -128,7 +129,7 @@ export class VizzyOptionsManager {
       default: init,
       display: "select",
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
+      order: this.getNextSectionOrder(section),
       values: choices
     }
   }
@@ -139,7 +140,7 @@ export class VizzyOptionsManager {
       default: init,
       display: "select",
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
+      order: this.getNextSectionOrder(section),
       values: choices,
       display_size: "third"
     }
@@ -151,7 +152,7 @@ export class VizzyOptionsManager {
       default: init,
       display: "radio",
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
+      order: this.getNextSectionOrder(section),
       values: choices
     }
   }
@@ -173,7 +174,7 @@ export class VizzyOptionsManager {
       default: init,
       display: "divider",
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
+      order: this.getNextSectionOrder(section),
     }
   }
   makeNumberRange(section: string, label: string, init: string, choices: SelectOption[]): VisOption {
@@ -183,18 +184,21 @@ export class VizzyOptionsManager {
       default: init,
       display: "range",
       section: section,
-      order: this.getNextSectionOrder(section) * OPTION_DEPEND_LIMIT,
+      order: this.getNextSectionOrder(section),
       values: choices
     }
   }
-  dependNumberRange(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: any): VisOption {
+  dependNumberRange(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: VisualizationDefinition): VisOption {
+    const parentOptions = parentObj.options || {}
+    const parentOption = parentOptions[parentKey]
+    const parentIndex = parentOption.order || 0
     return {
       type: "number",
       label: label,
       default: init,
       display: "range",
       section: section,
-      order: parentObj.options[parentKey].order + 1,
+      order: parentIndex + 1,
       values: choices
     }
   }

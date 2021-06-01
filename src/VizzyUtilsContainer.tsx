@@ -1,7 +1,7 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
 import {ComponentsProvider, ProgressCircular, Space, Heading} from "@looker/components"
-import {JsonViewer, VizzyUtils} from "./VizzyUtils"
+import {JsonViewer, ChartArea, VizzyUtils} from "./VizzyUtils"
 import {
   Looker,
   CustomViz, 
@@ -13,6 +13,7 @@ import {
 
 // Global values provided via the API
 declare var looker: Looker
+// TODO: Prototype LookerChartUtils examples
 declare var LookerCharts: LookerChartUtils
 
 // Instantiate the VizzyUtils helper class
@@ -31,6 +32,7 @@ const viz: CustomViz = {
       {"done": "done"},
       {"prepared data": "vizData"},
     ]),
+    showTitle: Vizzy.makeToggle("Plot", "Show Title Override", false),
     numDims: Vizzy.makeNumber("Plot", "Number of Dimensions", 1),
     numMeas: Vizzy.makeNumber("Plot", "Number of Measures", 1),
   },
@@ -41,14 +43,17 @@ const viz: CustomViz = {
   // this happens for every render n > 0
   updateAsync(data, element, config, queryResponse, details, doneRendering) {
     // save a copy of previous render's options
+    // TODO move to Vizzy.loadOptions
     let previousOptions: VisOptions = {}
     Object.assign(previousOptions, this.options)
 
     // add any dynamic options
+    this.options.titleText = config.showTitle && Vizzy.dependString("Plot", "Title Override", "Hello, world!", "showTitle", viz)
     this.options.strictDims = Vizzy.dependToggle("Plot", `Expect exactly ${config.numDims} dimensions`, false, "numDims", viz)
     this.options.strictMeas = Vizzy.dependToggle("Plot", `Expect exactly ${config.numMeas} measures`, false, "numMeas", viz)
 
-    // register new options if options has changed since last render
+    // register new options if options have changed since last render
+    // TODO move to Vizzy.saveOptions
     if (JSON.stringify(previousOptions) !== JSON.stringify(this.options)) {
       this.trigger && this.trigger('registerOptions', this.options)
     }
@@ -63,14 +68,12 @@ const viz: CustomViz = {
 
     // render chart
     this.chart = ReactDOM.render(
-      <ComponentsProvider
-      loadGoogleFonts
-      themeCustomizations={{colors: {key: "rgb(45, 126, 234)"}}}>
-        <Heading>Hello, world!</Heading>
+      <ChartArea>
+        {config.showTitle && <Heading>{config.titleText}</Heading>}
         <JsonViewer 
           data={eval(config.view)}
         />
-      </ComponentsProvider>,
+      </ChartArea>,
       element
     )
 

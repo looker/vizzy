@@ -68,7 +68,7 @@ export interface VisualizationDefinition {
   options: VisOptions
   addError?: (error: VisualizationError) => void
   clearErrors?: (errorName?: string) => void
-  create: (element: HTMLElement, settings: VisConfig) => void
+  create?: (element: HTMLElement, settings: VisConfig) => void
   trigger?: (event: string, config: object[] | VisOptions) => void
   update?: (data: VisData, element: HTMLElement, config: VisConfig, queryResponse: VisQueryResponse, details?: VisUpdateDetails) => void
   updateAsync?: (data: VisData, element: HTMLElement, config: VisConfig, queryResponse: VisQueryResponse, details: VisUpdateDetails | undefined, updateComplete: () => void) => void

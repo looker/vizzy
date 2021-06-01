@@ -25,7 +25,7 @@
 
  */
 
-export { JsonViewer } from './components'
+export { JsonViewer, ChartArea } from './components'
 export { LookerChartUtils, VisualizationDefinition } from './types'
 export { TooltipProps, VizzyTooltipProps, VizzyTooltip } from './Tooltip/VizzyTooltip'
 
@@ -49,7 +49,6 @@ export {
   VisData
 } from './QueryIngestion/types'
 
-import { VizzyOptionsManager } from './Configuration'
 import { VizzyQueryFormatter } from './QueryIngestion'
 
 /**
