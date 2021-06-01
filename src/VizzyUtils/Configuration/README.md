@@ -42,7 +42,8 @@ const viz: CustomViz = {
 **Note! Option keys should contain at least two parts and be written/referenced in camelCase.**
 
 ### dependOption
-The `depend` variant should be used for dynamic or conditional configuration options. 
+The `depend` variant should be used for dynamic or conditional configuration options.
+ 
 Available dependOptions: [dependToggle, dependString, dependSingleColor, dependRadio, dependNumberRange]
 
 ```
