@@ -57,6 +57,19 @@ export class VizzyOptionsManager {
     return currentIndex * OPTION_INDEX_BUFFER
   }
 
+  /**
+   * Gets the given option's "order" (or index) for the child option's index
+   * @param parentObj - The full Visualization object
+   * @param parentKey - The string key of the parent's option object
+   * @returns - parent's option object section index
+   */
+  getParentSectionOrder(parentObj: any, parentKey: string) {
+    const parentOptions = parentObj.options || {}
+    const parentOption = parentOptions[parentKey]
+    const parentIndex = parentOption.order || 0
+    return parentIndex
+  }
+
   makeToggle(section: string, label: string, init: boolean): VisOption {
     return {
       type: "boolean",
@@ -72,7 +85,7 @@ export class VizzyOptionsManager {
       label: label,
       default: init,
       section: section,
-      order: parentObj.options[parentKey].order + 1
+      order: this.getParentSectionOrder(parentObj, parentKey) + 1
     }
   }
   makeString(section: string, label: string, init: string): VisOption {
@@ -99,7 +112,7 @@ export class VizzyOptionsManager {
       label: label,
       default: init,
       section: section,
-      order: parentObj.options[parentKey].order + 1
+      order: this.getParentSectionOrder(parentObj, parentKey) + 1
     }
   }
   makeColor(section: string, label: string): VisOption {
@@ -117,7 +130,7 @@ export class VizzyOptionsManager {
       label: label,
       section: section,
       display: "color",
-      order: parentObj.options[parentKey].order + 1,
+      order: this.getParentSectionOrder(parentObj, parentKey) + 1,
       display_size: "half",
       default: ["#282828"],
     }
@@ -163,7 +176,7 @@ export class VizzyOptionsManager {
       default: init,
       display: "radio",
       section: section,
-      order: parentObj.options[parentKey].order + 1,
+      order: this.getParentSectionOrder(parentObj, parentKey) + 1,
       values: choices
     }
   }
@@ -189,16 +202,13 @@ export class VizzyOptionsManager {
     }
   }
   dependNumberRange(section: string, label: string, init: string, choices: SelectOption[], parentKey: string, parentObj: VisualizationDefinition): VisOption {
-    const parentOptions = parentObj.options || {}
-    const parentOption = parentOptions[parentKey]
-    const parentIndex = parentOption.order || 0
     return {
       type: "number",
       label: label,
       default: init,
       display: "range",
       section: section,
-      order: parentIndex + 1,
+      order: this.getParentSectionOrder(parentObj, parentKey) + 1,
       values: choices
     }
   }
