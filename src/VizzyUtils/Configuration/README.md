@@ -7,6 +7,7 @@ Vizzy contains option-generation helpers of `make` and `depend` variants.
 ### makeOption
 Available makeOptions: [makeToggle, makeString, makeNumber, makeColor, makeList, makeSmallList, makeRadio, makeDivider, makeNumberRange]
 
+```
 interface props<makeOption> {
   /**
   `section` - The Visualization Configuration pane's Tab text
@@ -25,6 +26,7 @@ interface props<makeOption> {
   */
   choices?: SelectOption[]
 }
+```
 
 ### Example usage
 ```
@@ -40,6 +42,7 @@ Note! Option keys should contain at least two parts and be written/referenced in
 ### dependOption
 Available dependOptions: [dependToggle, dependString, dependSingleColor, dependRadio, dependNumberRange]
 
+```
 interface props<dependOption> {
   /**
   `section` - The Visualization Configuration pane's Tab text
@@ -66,6 +69,7 @@ interface props<dependOption> {
   */
   parentObj: CustomViz
 }
+```
 
 ### Example usage
 ```
