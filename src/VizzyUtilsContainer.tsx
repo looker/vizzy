@@ -19,7 +19,6 @@ declare var LookerCharts: LookerChartUtils
 const Vizzy = new VizzyUtils()
 
 const viz: CustomViz = {
-  // initial options applied to viz
   options: {
     view: Vizzy.makeList("Plot", "Json Inspector", "vizData", 
     [
@@ -35,11 +34,9 @@ const viz: CustomViz = {
     numDims: Vizzy.makeNumber("Plot", "Number of Dimensions", 1),
     numMeas: Vizzy.makeNumber("Plot", "Number of Measures", 1),
   },
-  // this happens exactly once
   create(element, config) {
     // Do Nothing
   },
-  // this happens for every render n > 0
   updateAsync(data, element, config, queryResponse, details, doneRendering) {
     // save a copy of previous render's options
     Vizzy.loadOptions(this.options)
