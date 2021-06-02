@@ -1,13 +1,12 @@
-import * as React from "react"
-import * as ReactDOM from "react-dom"
-import {ComponentsProvider, ProgressCircular, Space, Heading} from "@looker/components"
+import React from "react"
+import ReactDOM from "react-dom"
+import {Heading} from "@looker/components"
 import {JsonViewer, ChartArea, VizzyUtils} from "./VizzyUtils"
 import {
   Looker,
   CustomViz, 
 } from './types'
 import {
-  VisOptions,
   LookerChartUtils
 } from './VizzyUtils'
 
@@ -43,20 +42,13 @@ const viz: CustomViz = {
   // this happens for every render n > 0
   updateAsync(data, element, config, queryResponse, details, doneRendering) {
     // save a copy of previous render's options
-    // TODO move to Vizzy.loadOptions
-    let previousOptions: VisOptions = {}
-    Object.assign(previousOptions, this.options)
-
+    Vizzy.loadOptions(this.options)
     // add any dynamic options
-    this.options.titleText = config.showTitle && Vizzy.dependString("Plot", "Title Override", "Hello, world!", "showTitle", viz)
-    this.options.strictDims = Vizzy.dependToggle("Plot", `Expect exactly ${config.numDims} dimensions`, false, "numDims", viz)
-    this.options.strictMeas = Vizzy.dependToggle("Plot", `Expect exactly ${config.numMeas} measures`, false, "numMeas", viz)
-
+    this.options.titleText = config.showTitle && Vizzy.dependString("Plot", "Title Override", "Hello, world!", "showTitle")
+    this.options.strictDims = Vizzy.dependToggle("Plot", `Expect exactly ${config.numDims} dimensions`, false, "numDims")
+    this.options.strictMeas = Vizzy.dependToggle("Plot", `Expect exactly ${config.numMeas} measures`, false, "numMeas")
     // register new options if options have changed since last render
-    // TODO move to Vizzy.saveOptions
-    if (JSON.stringify(previousOptions) !== JSON.stringify(this.options)) {
-      this.trigger && this.trigger('registerOptions', this.options)
-    }
+    Vizzy.saveOptions(this.options, viz)
 
     // use Vizzy to create a slim, data-ful queryResponse
     const vizData = Vizzy.prepare(data, config, queryResponse, viz, {
