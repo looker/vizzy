@@ -65,12 +65,21 @@ export interface LookerChartUtils {
 export interface VisualizationDefinition {
   id?: string
   label?: string
+  /**
+   * Options are the specification for how specific configurations are rendered in the Visualization's configuration pane.
+   */
   options: VisOptions
   addError?: (error: VisualizationError) => void
   clearErrors?: (errorName?: string) => void
+  /**
+   * This function is called exactly once, when initializing the visualization's iFrame
+   */
   create?: (element: HTMLElement, settings: VisConfig) => void
   trigger?: (event: string, config: object[] | VisOptions) => void
   update?: (data: VisData, element: HTMLElement, config: VisConfig, queryResponse: VisQueryResponse, details?: VisUpdateDetails) => void
+  /**
+   * This function is called for each re-render. Re-render conditions include query changes, configuration changes, and iFrame resizing.
+   */
   updateAsync?: (data: VisData, element: HTMLElement, config: VisConfig, queryResponse: VisQueryResponse, details: VisUpdateDetails | undefined, updateComplete: () => void) => void
   destroy?: () => void
 }

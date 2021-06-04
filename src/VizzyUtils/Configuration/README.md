@@ -43,7 +43,7 @@ const viz: CustomViz = {
 
 ### dependOption
 The `depend` variant should be used for dynamic or conditional configuration options.
- 
+
 Available dependOptions: [dependToggle, dependString, dependSingleColor, dependRadio, dependNumberRange]
 
 ```
@@ -68,10 +68,6 @@ interface props<dependOption> {
   `parentKey` - The option key of the parent. Option keys should contain at least two parts and be written/referenced in camelCase.
   */
   parentKey: string
-  /**
-  `parentObj` - The current Visualization object, whose options are indexed into
-  */
-  parentObj: CustomViz
 }
 ```
 
@@ -85,9 +81,9 @@ const viz: CustomViz = {
     ...
     // conditional option
     this.options.featureValue = config.enableFeature && 
-      Vizzy.dependString("Plot", "Feature Input", "Hello, world!", "enableFeature", viz)
+      Vizzy.dependString("Plot", "Feature Input", "Hello, world!", "enableFeature")
     // dynamic option
-    this.options.featureStyle = Vizzy.dependToggle("Plot", `Apply "${config.featureValue}" style`, false, "featureValue", viz)
+    this.options.featureStyle = Vizzy.dependToggle("Plot", `Apply "${config.featureValue}" style`, false, "featureValue")
     ...
   },
   ...
