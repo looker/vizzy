@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import {Heading} from "@looker/components"
+import {Heading, Button} from "@looker/components"
 import {JsonViewer, ChartArea, VizzyUtils} from "./VizzyUtils"
 import {
   Looker,
@@ -59,6 +59,7 @@ const viz: CustomViz = {
     this.chart = ReactDOM.render(
       <ChartArea>
         {config.showTitle && <Heading>{config.titleText}</Heading>}
+        {details?.crossfilterEnabled && <Button onClick={() => LookerCharts.Utils.toggleCrossfilter({row: data[0]})}>Add to Crossfilter</Button>}
         <JsonViewer 
           data={eval(config.view)}
         />
