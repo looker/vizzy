@@ -1,6 +1,6 @@
 import React from "react"
 import ReactDOM from "react-dom"
-import {Heading, Button} from "@looker/components"
+import {Heading, Button, TabPanel, Tabs, TabList, Tab, TabPanels} from "@looker/components"
 import {JsonViewer, ChartArea, VizzyUtils} from "./VizzyUtils"
 import {
   Looker,
@@ -9,6 +9,9 @@ import {
 import {
   LookerChartUtils
 } from './VizzyUtils'
+import {
+  Map
+} from './VizzyCharts/Map'
 
 // Global values provided via the API
 declare var looker: Looker
@@ -20,6 +23,11 @@ const Vizzy = new VizzyUtils()
 
 const viz: CustomViz = {
   options: {
+    vizType: Vizzy.makeList("Plot", "Visualization Type", "example", 
+    [
+      {"example": "example"},
+      {"map": "map"},
+    ]),
     view: Vizzy.makeList("Plot", "Json Inspector", "vizData", 
     [
       {"data": "data"},
@@ -58,11 +66,23 @@ const viz: CustomViz = {
     // render chart
     this.chart = ReactDOM.render(
       <ChartArea>
-        {config.showTitle && <Heading>{config.titleText}</Heading>}
-        {details?.crossfilterEnabled && <Button onClick={() => LookerCharts.Utils.toggleCrossfilter({row: data[0]})}>Add to Crossfilter</Button>}
-        <JsonViewer 
-          data={eval(config.view)}
-        />
+        {config.vizType === 'example' && <Tabs>
+          <TabList>
+            <Tab>JSON Viewer</Tab>
+            <Tab>{`<Map/>`}</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              {config.showTitle && <Heading>{config.titleText}</Heading>}
+              {details?.crossfilterEnabled && <Button onClick={() => LookerCharts.Utils.toggleCrossfilter({row: data[0]})}>Add to Crossfilter</Button>}
+              <JsonViewer 
+                data={eval(config.view)}
+              />
+            </TabPanel>
+            <TabPanel><Map/></TabPanel>
+          </TabPanels>
+        </Tabs>}
+        {config.vizType === 'map' && <Map/>}
       </ChartArea>,
       element
     )
