@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from "styled-components"
-import {ComponentsProvider} from "@looker/components"
+import {ComponentsProvider, theme} from "@looker/components"
 
 const ChartAreaWrapper = styled.div``
 
