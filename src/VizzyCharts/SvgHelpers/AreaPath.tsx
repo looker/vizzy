@@ -4,7 +4,7 @@ import {ComponentsProvider} from "@looker/components"
 
 import {
   useChartConfig
-} from './ChartConfigContextProvider'
+} from '../ChartConfigContextProvider'
 
 const AreaPathWrapper = styled.path``
 
